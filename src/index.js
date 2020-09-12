@@ -5,46 +5,27 @@ var bodyParser = require('body-parser');
 var app = express();
 app.use(bodyParser.json());
 
-var reviews;
-
-function setReviews(dummyReviews) {
-    reviews = dummyReviews;
-
-    for(var i = 0; i <= reviews.recordset[0].length; i++){
-        console.log("The review is: " + reviews[i]);
-    };
-};
-
-function loadEmployees() {
-    sql.connect(config, function (err) {   
-        if (err) console.log(err);
-        var request = new sql.Request();
-        request.query('select * from dbo.Reviews', function (err, result) {
-            
-            if (err){
-                console.log(err)   
-            }
-            setReviews(result.recordset);
-        });
-    });
-};
-
-
-loadEmployees();
 
 app.get('/reviews', function (req, res) {
+    
     sql.connect(config, function (err) {   
         if (err) console.log(err);
         var request = new sql.Request();
         request.query('select * from dbo.Reviews', function (err, result) {
+
+            var reviews = [];
             
             if (err){
-                console.log(err)   
+                console.log(err);
             }
-            res.json(result.recordset);
-            
+
+            for(var i = 0; i < result.recordset.length; i++){
+                reviews.push(result.recordset[i].WhiskeyName);
+            }
+        
+            res.send(reviews);
         });
-    });
+    });   
 });
 
 // app.get('/GetSpecificReview/:name', function(req, res){
